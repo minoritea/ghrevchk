@@ -27,15 +27,16 @@ func fetch(ctx context.Context, owner, repo, user, state string) error {
 		WithRequestModifier(func(r *http.Request) {
 			r.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
 		})
+	if os.Getenv("DEBUG") != "" {
+		client = client.WithDebug(true)
+	}
 	type Query struct {
 		Search struct {
-			Edges []struct {
-				Node struct {
-					PullRequest struct {
-						Title string
-						URL   string
-					} `graphql:"... on PullRequest"`
-				}
+			Nodes []struct {
+				PullRequest struct {
+					Title string
+					URL   string
+				} `graphql:"... on PullRequest"`
 			}
 			PageInfo struct {
 				HasNextPage bool
@@ -55,8 +56,8 @@ func fetch(ctx context.Context, owner, repo, user, state string) error {
 	if err != nil {
 		return err
 	}
-	for _, edge := range result.Search.Edges {
-		fmt.Printf("%s\n> %s\n\n", edge.Node.PullRequest.Title, edge.Node.PullRequest.URL)
+	for _, node := range result.Search.Nodes {
+		fmt.Printf("%s\n> %s\n\n", node.PullRequest.Title, node.PullRequest.URL)
 	}
 	return nil
 }
