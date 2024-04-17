@@ -22,7 +22,7 @@ func ownerAndRepo(r string) (string, string) {
 	return "", ""
 }
 
-func fetch(ctx context.Context, owner, repo, user string) error {
+func fetch(ctx context.Context, owner, repo, user, state string) error {
 	client := graphql.NewClient("https://api.github.com/graphql", nil).
 		WithRequestModifier(func(r *http.Request) {
 			r.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
@@ -45,9 +45,10 @@ func fetch(ctx context.Context, owner, repo, user string) error {
 	}
 	result, err := query[Query](ctx, client, map[string]any{
 		"query": fmt.Sprintf(
-			"is:pr is:open repo:%s/%s state:open involves:%s",
+			"is:pr repo:%s/%s state:%s involves:%s",
 			owner,
 			repo,
+			state,
 			user,
 		),
 	})
@@ -81,7 +82,7 @@ func run() error {
 		return fmt.Errorf("user is required")
 	}
 	owner, repo := ownerAndRepo(flag.Arg(0))
-	return fetch(context.Background(), owner, repo, user)
+	return fetch(context.Background(), owner, repo, user, state)
 }
 
 func main() {
