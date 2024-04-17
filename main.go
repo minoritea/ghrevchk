@@ -70,7 +70,7 @@ func run() error {
 		}
 	}
 	for _, pr := range requested {
-		fmt.Println(pr.GetTitle(), "\n> ", pr.GetHTMLURL())
+		fmt.Printf("%s\n>  %s\n\n", pr.GetTitle(), pr.GetHTMLURL())
 	}
 	return nil
 }
