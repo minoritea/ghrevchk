@@ -1,0 +1,15 @@
+#!/bin/bash
+repo="$1" # format as org/repo
+reviewer="$2"
+if [ -z "$repo" ]
+then
+  echo "Usage: ghrevchk <org/repo> [reviewer]"
+  exit 1
+fi
+if [ -z "$reviewer" ]
+then
+  reviewer="@me"
+fi
+
+# requires Github CLI
+gh pr list -R "$repo" -s open -S "involves:${reviewer} -review:approved" --json url,title
